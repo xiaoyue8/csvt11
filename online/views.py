@@ -1,6 +1,6 @@
 # Create your views here.
 from django import forms
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 
@@ -12,7 +12,16 @@ def login(req):
 		uf = UserForm(req.POST)
 		if uf.is_valid():
 			username = uf.cleaned_data['username']
-			return HttpResponse('login ok')
+			req.session['username'] = username
+			return HttpResponseRedirect('/index/')
 	else :
 		uf = UserForm()
 	return render_to_response('login.html',{'uf':uf})
+	
+def index(req):
+	username = req.session.get('username','')
+	return render_to_response('index.html',{'username':username})
+	
+def logout(req):
+	del req.session['username']
+	return HttpResponse('logout ok!')
